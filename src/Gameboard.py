@@ -5,7 +5,7 @@ class Gameboard:
     
     __boardsize = 8
     __maxboardsizeIndex = __boardsize - 1
-
+    __currentSide = 2
     __board = []
 
     def __init__(self):
@@ -23,12 +23,13 @@ class Gameboard:
 
         print("Gameboard initialized")
 
-    def placePiece(self, row, column, piece):
+    def placePiece(self, row, column):
 
         nullpiece = 0
-        enermyPiece = 2 if piece == 1 else 1
-
-        self.__board[row][column] = piece
+        enermyPiece = 2 if self.getCurrentSide() == 1 else 1
+        if self.__board[row][column] != 0:
+            raise Exception("Not empty position")
+        self.__board[row][column] = self.getCurrentSide()
 
         # flip pieces
 
@@ -39,7 +40,7 @@ class Gameboard:
             for horizontalChecker in range(column - 1, 0 , -1):
                 if self.__board[row][horizontalChecker] == enermyPiece:
                     continue
-                elif self.__board[row][horizontalChecker] == piece:
+                elif self.__board[row][horizontalChecker] == self.getCurrentSide():
                     horizontalFliper = horizontalChecker
                     break
                 elif self.__board[row][horizontalChecker] == nullpiece:
@@ -55,7 +56,7 @@ class Gameboard:
             for horizontalChecker in range(column + 1, self.__boardsize):
                 if self.__board[row][horizontalChecker] == enermyPiece:
                     continue
-                elif self.__board[row][horizontalChecker] == piece:
+                elif self.__board[row][horizontalChecker] == self.getCurrentSide():
                     horizontalFliper = horizontalChecker
                     break
                 elif self.__board[row][horizontalChecker] == nullpiece:
@@ -73,7 +74,7 @@ class Gameboard:
             for verticalChecker in range(row - 1, 0 , -1):
                 if self.__board[verticalChecker][column] == enermyPiece:
                     continue
-                elif self.__board[verticalChecker][column] == piece:
+                elif self.__board[verticalChecker][column] == self.getCurrentSide():
                     verticalFliper = verticalChecker
                     break
                 elif self.__board[verticalChecker][column] == nullpiece:
@@ -89,7 +90,7 @@ class Gameboard:
             for verticalChecker in range(row + 1, self.__boardsize):
                 if self.__board[verticalChecker][column] == enermyPiece:
                     continue
-                elif self.__board[verticalChecker][column] == piece:
+                elif self.__board[verticalChecker][column] == self.getCurrentSide():
                     verticalFliper = verticalChecker
                     break
                 elif self.__board[verticalChecker][column] == nullpiece:
@@ -106,7 +107,7 @@ class Gameboard:
             for diagonalChecker in range(1, (row if row < column else column) + 1):
                 if self.__board[row - diagonalChecker][column - diagonalChecker] == enermyPiece:
                     continue
-                elif self.__board[row - diagonalChecker][column - diagonalChecker] == piece:
+                elif self.__board[row - diagonalChecker][column - diagonalChecker] == self.getCurrentSide():
                     diagonalFliper = diagonalChecker
                     break
                 elif self.__board[row - diagonalChecker][column - diagonalChecker] == nullpiece:
@@ -122,7 +123,7 @@ class Gameboard:
             for diagonalChecker in range(1, (row if row < self.__maxboardsizeIndex - column else self.__maxboardsizeIndex - column) + 1):
                 if self.__board[row - diagonalChecker][column + diagonalChecker] == enermyPiece:
                     continue
-                elif self.__board[row - diagonalChecker][column + diagonalChecker] == piece:
+                elif self.__board[row - diagonalChecker][column + diagonalChecker] == self.getCurrentSide():
                     diagonalFliper = diagonalChecker
                     break
                 elif self.__board[row - diagonalChecker][column + diagonalChecker] == nullpiece:
@@ -138,7 +139,7 @@ class Gameboard:
             for diagonalChecker in range(1, (self.__maxboardsizeIndex - row if self.__maxboardsizeIndex - row < column else column) + 1):
                 if self.__board[row + diagonalChecker][column - diagonalChecker] == enermyPiece:
                     continue
-                elif self.__board[row + diagonalChecker][column - diagonalChecker] == piece:
+                elif self.__board[row + diagonalChecker][column - diagonalChecker] == self.getCurrentSide():
                     diagonalFliper = diagonalChecker
                     break
                 elif self.__board[row + diagonalChecker][column - diagonalChecker] == nullpiece:
@@ -154,7 +155,7 @@ class Gameboard:
             for diagonalChecker in range(1, (self.__maxboardsizeIndex - row if row > column else self.__maxboardsizeIndex - column) + 1):
                 if self.__board[row + diagonalChecker][column + diagonalChecker] == enermyPiece:
                     continue
-                elif self.__board[row + diagonalChecker][column + diagonalChecker] == piece:
+                elif self.__board[row + diagonalChecker][column + diagonalChecker] == self.getCurrentSide():
                     diagonalFliper = diagonalChecker
                     break
                 elif self.__board[row + diagonalChecker][column + diagonalChecker] == nullpiece:
@@ -163,6 +164,11 @@ class Gameboard:
         if diagonalFliper > 0:
             for fliper in range(1, diagonalFliper):
                 self.flipPiece(self.__board[row + fliper][column + fliper])
+        if self.__currentSide == 1:
+            self.__currentSide = 2
+        else:
+            self.__currentSide = 1
+            
 
     def flipPiece(self, row, column):
         if self.__board[row][column] == 1:
@@ -229,6 +235,12 @@ class Gameboard:
     def printBoard(self):
         for i in self.__board:
             print(i)
+
+    def isGameOver(self):
+        return False
+
+    def getCurrentSide(self):
+        return self.__currentSide
 
     def resetBoard(self):
         for row in range(self.__boardsize):

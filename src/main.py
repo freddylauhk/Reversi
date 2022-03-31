@@ -8,7 +8,16 @@ def main():
     whiteSidePlayer = Player(True)
     blackSidePlayer = Player(False)
 
-    whiteSidePlayer.getCursorPosition()
-    blackSidePlayer.getCursorPosition()
+    while not gameboard.isGameOver():
+        try:
+            userInput = input(("white" if gameboard.getCurrentSide() == 1 else "black") + " turn (split with comma): ")
+            position = userInput.split(",")
+            gameboard.placePiece(int(position[0]), int(position[1]))
+            gameboard.printBoard()
+        except Exception as e:
+            print(e)
+    print("someone win")
+    #whiteSidePlayer.getCursorPosition()
+    #blackSidePlayer.getCursorPosition()
 
 main()
