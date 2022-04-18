@@ -164,11 +164,8 @@ class Gameboard:
         if diagonalFliper > 0:
             for fliper in range(1, diagonalFliper):
                 self.flipPiece(row + fliper, column + fliper)
-                
-        if self.__currentSide == 1:
-            self.__currentSide = 2
-        else:
-            self.__currentSide = 1
+        
+        self.switchSide()
             
 
     def flipPiece(self, row, column):
@@ -178,17 +175,17 @@ class Gameboard:
             self.__board[row][column] = 1
 
 
-    def getAvaliableMove(self):
+    def getAvaliableMove(self, pieceType):
 
         nullpiece = 0
-        enermyPiece = 2 if self.getCurrentSide() == 1 else 1
+        enermyPiece = 2 if pieceType == 1 else 1
 
-        # Check duplicate in list
         availableMoveList = []
 
         for row in range(self.__boardsize):
             for column in range(self.__boardsize):
-                if(self.__board[row][column] == self.getCurrentSide()):
+                if(self.__board[row][column] == pieceType):
+
                     # Horizontal
                     # Horizontal Left
                     horizontalPointer = column
@@ -196,15 +193,14 @@ class Gameboard:
                         for horizontalChecker in range(column - 1, 0 , -1):
                             if self.__board[row][horizontalChecker] == enermyPiece:
                                 continue
-                            elif self.__board[row][horizontalChecker] == self.getCurrentSide():
-                                horizontalPointer = horizontalChecker
+                            elif self.__board[row][horizontalChecker] == pieceType:
                                 break
                             elif self.__board[row][horizontalChecker] == nullpiece:
+                                horizontalPointer = horizontalChecker
                                 break
 
-                    if(horizontalPointer < column):
-                        availableMoveList.append([row,column])
-                        break
+                    if(horizontalPointer < column - 1):
+                        availableMoveList.append([row,horizontalPointer])
 
                     # Horizontal Right
                     horizontalPointer = column
@@ -212,61 +208,112 @@ class Gameboard:
                         for horizontalChecker in range(column + 1, self.__boardsize):
                             if self.__board[row][horizontalChecker] == enermyPiece:
                                 continue
-                            elif self.__board[row][horizontalChecker] == self.getCurrentSide():
-                                horizontalPointer = horizontalChecker
+                            elif self.__board[row][horizontalChecker] == pieceType:
                                 break
                             elif self.__board[row][horizontalChecker] == nullpiece:
+                                horizontalPointer = horizontalChecker
                                 break
                     
-                    if(horizontalPointer > column):
-                        availableMoveList.append([row,column])
-                        break
+                    if(horizontalPointer > column + 1):
+                        availableMoveList.append([row,horizontalPointer])
                     
                     # Vertical
-                    # Vertical Left
+                    # Vertical Top
                     verticalPointer = row
                     if(row != 0):
                         for verticalChecker in range(row - 1, 0 , -1):
                             if self.__board[verticalChecker][column] == enermyPiece:
                                 continue
-                            elif self.__board[verticalChecker][column] == self.getCurrentSide():
-                                verticalPointer = verticalChecker
+                            elif self.__board[verticalChecker][column] == pieceType:
                                 break
                             elif self.__board[verticalChecker][column] == nullpiece:
+                                verticalPointer = verticalChecker
                                 break
 
-                    if(verticalPointer < row):
-                        availableMoveList.append([row,column])
-                        break
+                    if(verticalPointer < row - 1):
+                        availableMoveList.append([verticalPointer,column])
 
-                    # Vertical Right
+                    # Vertical Bottom
                     verticalPointer = row
                     if(row != self.__maxboardsizeIndex):
                         for verticalChecker in range(row + 1, self.__boardsize):
                             if self.__board[verticalChecker][column] == enermyPiece:
                                 continue
-                            elif self.__board[verticalChecker][column] == self.getCurrentSide():
-                                verticalPointer = verticalChecker
+                            elif self.__board[verticalChecker][column] == pieceType:
                                 break
                             elif self.__board[verticalChecker][column] == nullpiece:
+                                verticalPointer = verticalChecker
                                 break
                     
-                    if(verticalPointer > row):
-                        availableMoveList.append([row,column])
-                        break
+                    if(verticalPointer > row + 1):
+                        availableMoveList.append([verticalPointer,column])
 
                     # Diagonal
                     # Top Left
+                    diagonalPointer = 0
+                    if(row != 0 and column != 0):
+                        for diagonalChecker in range(1, (row if row < column else column) + 1):
+                            if self.__board[row - diagonalChecker][column - diagonalChecker] == enermyPiece:
+                                continue
+                            elif self.__board[row - diagonalChecker][column - diagonalChecker] == pieceType:
+                                break
+                            elif self.__board[row - diagonalChecker][column - diagonalChecker] == nullpiece:
+                                diagonalPointer = diagonalChecker
+                                break
+
+                    if diagonalPointer > 1:
+                        availableMoveList.append([row - diagonalPointer, column - diagonalPointer])
 
                     # Top Right
+                    diagonalPointer = 0
+                    if(row != 0 and column != self.__maxboardsizeIndex):
+                        for diagonalChecker in range(1, (row if row < self.__maxboardsizeIndex - column else self.__maxboardsizeIndex - column) + 1):
+                            if self.__board[row - diagonalChecker][column + diagonalChecker] == enermyPiece:
+                                continue
+                            elif self.__board[row - diagonalChecker][column + diagonalChecker] == pieceType:
+                                break
+                            elif self.__board[row - diagonalChecker][column + diagonalChecker] == nullpiece:
+                                diagonalPointer = diagonalChecker
+                                break
 
+                    if diagonalPointer > 1:
+                        availableMoveList.append([row - diagonalPointer, column + diagonalPointer])
 
                     # Bottom left
+                    # Bottom left
+                    diagonalPointer = 0
+                    if(row != self.__maxboardsizeIndex and column != 0):
+                        for diagonalChecker in range(1, (self.__maxboardsizeIndex - row if self.__maxboardsizeIndex - row < column else column) + 1):
+                            if self.__board[row + diagonalChecker][column - diagonalChecker] == enermyPiece:
+                                continue
+                            elif self.__board[row + diagonalChecker][column - diagonalChecker] == pieceType:
+                                break
+                            elif self.__board[row + diagonalChecker][column - diagonalChecker] == nullpiece:
+                                diagonalPointer = diagonalChecker
+                                break
 
+                    if diagonalPointer > 1:
+                        availableMoveList.append([row + diagonalPointer, column - diagonalPointer])
 
                     # Bottom right
+                    diagonalPointer = 0
+                    if(row != self.__maxboardsizeIndex and column != self.__maxboardsizeIndex):
+                        for diagonalChecker in range(1, (self.__maxboardsizeIndex - row if row > column else self.__maxboardsizeIndex - column) + 1):
+                            if self.__board[row + diagonalChecker][column + diagonalChecker] == enermyPiece:
+                                continue
+                            elif self.__board[row + diagonalChecker][column + diagonalChecker] == pieceType:
+                                break
+                            elif self.__board[row + diagonalChecker][column + diagonalChecker] == nullpiece:
+                                diagonalPointer = diagonalChecker
+                                break
 
-        return availableMoveList
+                    if diagonalPointer > 1:
+                        availableMoveList.append([row + diagonalPointer ,column + diagonalPointer])
+        
+        # remove duplicate
+        availableMoveList = set(map(tuple, availableMoveList))
+
+        return list(map(list, availableMoveList))
 
 
     def countPiecesOnBoard(self, pieceType):
@@ -279,7 +326,15 @@ class Gameboard:
         return count
 
     def getWinner(self):
-        return self.countPiecesOnBoard(1) if self.countPiecesOnBoard(1) > self.countPiecesOnBoard(2) else self.countPiecesOnBoard(2)
+        print("Number of White pieces on board: %d" % self.countPiecesOnBoard(1))
+        print("Number of Black pieces on board: %d" % self.countPiecesOnBoard(2))
+
+        if(self.countPiecesOnBoard(1) == self.countPiecesOnBoard(2)):
+            print("Tie!")
+        elif(self.countPiecesOnBoard(1) > self.countPiecesOnBoard(2)):
+            print("White wins!")
+        else:
+            print("Black wins!")
 
     def getBoard(self):
         return self.__board
@@ -288,8 +343,17 @@ class Gameboard:
         for i in self.__board:
             print(i)
 
+    def switchSide(self):
+        if self.__currentSide == 1:
+            self.__currentSide = 2
+        else:
+            self.__currentSide = 1
+
     def isGameOver(self):
-        return False
+        if(len(self.getAvaliableMove(1)) == 0 and len(self.getAvaliableMove(2)) == 0):
+            return True
+        else:
+            return False
 
     def getCurrentSide(self):
         return self.__currentSide
